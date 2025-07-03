@@ -1219,3 +1219,66 @@ div.macro[data-macro-name='purple'],
 div.macro[data-macro-name='purple']  div.hiccup_html {
   display: inline;
 }
+
+/**
+ * Black theme for reveal.js. This is the opposite of the 'white' theme.
+ *
+ * By Hakim El Hattab, http://hakim.se
+ *
+ * Adapted for Logseq by Peter Yanase, http://kneedeepjapan.com
+ **/
+
+/*********************************************
+ * GLOBAL STYLES
+ *********************************************/
+:root {
+  --r-heading-text-transform: normal;
+  --r-slideNumber: true;
+  --r-main-font-size: 25px;
+}
+
+/*********************************************
+ * HEADERS
+ *********************************************/
+.reveal {
+  & :is(h1, h2, h3, h4, h5, h6) {
+    text-transform: var(--r-heading-text-transform);
+    word-wrap: break-word;
+  }
+}
+.reveal {
+  font-size: var(--r-main-font-size);
+}
+
+.reveal.slides {
+  overflow-y: auto;
+}
+
+.reveal ol,
+.reveal dl,
+.reveal ul {
+  display: block;
+  text-align: left;
+  margin: 0 0 0 1em;
+}
+
+.reveal section:has(.embedded){
+  display: flex;
+  flex-direction: column;
+}
+
+.reveal section .embedded{
+  flex: 1 1 auto;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* -------- Logseq slides: keep images inside the 16 × 9 frame -------- */
+.reveal section img {
+  width:  auto !important;   /* cancel Reveal.js’ height:100%           */
+  height: auto !important;
+  max-width : 55vw;          /* never spill out horizontally            */
+  max-height: 55vh;          /* never spill out vertically              */
+  object-fit: contain;       /* preserve aspect ratio                   */
+}
