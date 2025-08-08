@@ -1,0 +1,156 @@
+/* ────────────────  custom.css  ──────────────── */
+
+
+
+
+/* 1️⃣  Headings – make them a bit smaller           *
+ * Reveal.js themes expose their sizes as CSS vars. *
+ * We override just the ones we care about.         */
+:root {
+    --r-heading1-size: 1.8em;   /* was ~2.6em */
+    --r-heading2-size: 1.4em;   /* was ~2.0em */
+    --r-heading3-size: 1.2em;   /* was ~1.5em */
+    --r-heading4-size: 1.1em;
+    --r-heading-letter-spacing: normal; /* optional tweak */
+    --r-heading-text-transform: normal; /* optional tweak */
+}
+
+/* 2️⃣  Lists – flush left and keep normal list indent   *
+ * Works for both <ul> and <ol> at any nesting level.    */
+.reveal .slides section ul,
+.reveal .slides section ol {
+    text-align: left;      /* stop centering */
+    margin-left: 0;       /* remove default indent */
+    margin-right: 0;      /* avoid accidental centering */
+    padding-left: 1.2em;  /* restore typical list indent */
+}
+
+.reveal {
+    :is(h1, h2, h3, h4, h5, h6) {
+        text-transform: normal;
+        word-wrap: break-word;
+    }
+}
+
+.reveal .footer {
+    position: fixed;
+    bottom: 0.25em;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75em; /* 원하는 만큼 작게 */
+    color: #7f8c8d; /* 원하는 색상 */
+    z-index: 10;
+    background: none; /* 필요하면 배경 투명 */
+    pointer-events: none; /* 이 바닥글 위에서 클릭 등 이벤트 무시하려면 */
+  }
+
+
+/* ─── 2-column helper ───────────────────────────────────────────── */
+.cols {                 /* the wrapper you’ll add in Markdown */
+    display: flex;
+    gap: 2rem;               /* space between columns */
+    align-items: stretch;    /* stretch to same height */
+    flex-wrap: wrap;         /* allow wrapping on small screens */
+    justify-content: space-between; /* space out columns */
+}
+  
+.cols > * {             /* every direct child becomes a column */
+    flex: 1 1 0;             /* 2 even columns – change flex if needed */
+    min-width: 0;            /* avoid overflow issues with long text */
+}
+
+/* ─── 2-column helper ───────────────────────────────────────────── */
+.cols-center {                 /* the wrapper you’ll add in Markdown */
+    display: flex;
+    gap: 2rem;               /* space between columns */
+    align-items: center;    /* stretch to same height */
+    flex-wrap: wrap;         /* allow wrapping on small screens */
+    justify-content: space-between; /* space out columns */
+}
+  
+.cols-center > * {             /* every direct child becomes a column */
+    flex: 1 1 0;             /* 2 even columns – change flex if needed */
+    min-width: 0;            /* avoid overflow issues with long text */
+}
+
+
+
+/* Guide frame – 16:9 dashed rectangle centred on every slide */
+/* Only visible in speaker/development mode, hidden in exports */
+.reveal .slides::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 1920px;          /* same numbers you set above            */
+    height: 1080px;
+    transform: translate(-50%, -50%);
+    border: 2px dashed rgba(255,255,255,.25);
+    pointer-events: none;   /* never blocks clicks/links */
+    z-index: 5;             /* above background, below content */
+}
+
+/* Hide guide frame when printing/exporting */
+@media print {
+    .reveal .slides::after {
+        display: none !important;
+    }
+}
+
+/* Hide in all possible export modes */
+.export .reveal .slides::after,
+.print-pdf .reveal .slides::after,
+body.print-pdf .reveal .slides::after,
+html.print-pdf .reveal .slides::after {
+    display: none !important;
+}
+
+
+
+/* ========= Minimal palette (11 colours) =============== */
+:root{
+    /* 8 accents – tweak hex codes to match your brand */
+    --c-red:     #e74c3c;
+    --c-orange:  #e67e22;
+    --c-yellow:  #f1c40f;
+    --c-green:   #2ecc71;
+    --c-teal:    #1abc9c;
+    --c-blue:    #3498db;
+    --c-purple:  #9b59b6;
+    --c-pink:    #ff4da6;
+    --c-gray:    #7f8c8d; /* optional gray for neutral elements */
+  
+    /* 2 neutrals */
+    --c-black:   #111;
+    --c-white:   #fff;
+}
+  
+/* ------------ text helpers (10) ----------------------- */
+.red     { color: var(--c-red);    }
+.orange  { color: var(--c-orange); }
+.yellow  { color: var(--c-yellow); }
+.green   { color: var(--c-green);  }
+.teal    { color: var(--c-teal);   }
+.blue    { color: var(--c-blue);   }
+.purple  { color: var(--c-purple); }
+.pink    { color: var(--c-pink);   }
+.gray    { color: var(--c-gray);   } /* optional gray for neutral text */
+.black   { color: var(--c-black);  }
+.white   { color: var(--c-white);  }
+
+/* ------------ badge / call-out helpers (8) ------------- */
+.bg-red     { background: var(--c-red);    color: var(--c-white); }
+.bg-orange  { background: var(--c-orange); color: var(--c-white); }
+.bg-yellow  { background: var(--c-yellow); color: var(--c-black); }
+.bg-green   { background: var(--c-green);  color: var(--c-white); }
+.bg-teal    { background: var(--c-teal);   color: var(--c-white); }
+.bg-blue    { background: var(--c-blue);   color: var(--c-white); }
+.bg-purple  { background: var(--c-purple); color: var(--c-white); }
+.bg-pink    { background: var(--c-pink);   color: var(--c-white); }
+.bg-gray    { background: var(--c-gray);   color: var(--c-white); } /* optional gray for neutral badges */
+
+/* optional: small pill look for inline badges */
+.badge{
+    display:inline-block; padding:.15em .5em;
+    border-radius:.4em; font-weight:600; font-size:85%;
+}
