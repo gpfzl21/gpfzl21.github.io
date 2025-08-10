@@ -32,6 +32,20 @@
     }
 }
 
+.reveal .slides .left-align{
+    text-align: left; /* left align text */
+    margin-left: 0;       /* remove default indent */
+    margin-right: 0;      /* avoid accidental centering */
+    padding-left: 1.2em;
+}
+
+.reveal .slides .right-align{
+    text-align: right; /* left align text */
+    margin-left: 0;       /* remove default indent */
+    margin-right: 0;      /* avoid accidental centering */
+    padding-left: 1.2em;
+}
+
 .reveal .footer {
     position: fixed;
     bottom: 0.25em;
@@ -42,8 +56,16 @@
     color: #7f8c8d; /* 원하는 색상 */
     z-index: 10;
     background: none; /* 필요하면 배경 투명 */
-    pointer-events: none; /* 이 바닥글 위에서 클릭 등 이벤트 무시하려면 */
-  }
+    /* pointer-events: none; 이 바닥글 위에서 클릭 등 이벤트 무시하려면 */
+}
+
+@media print {
+    /* 인쇄 모드에서 footer를 슬라이드 캔버스 밖으로 빼내기 */
+    .reveal .footer {
+        position: static !important;   /* 고정 해제 */
+        margin-top: auto;               /* 여백 확보 */
+    }
+}
 
 
 /* ─── 2-column helper ───────────────────────────────────────────── */

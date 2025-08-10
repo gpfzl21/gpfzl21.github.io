@@ -73,7 +73,18 @@
     
         <section >
             
-            <h1>LLM Worshop</h1>
+            <script>
+if (window.location.search.match(/print-pdf/gi)) {
+    Reveal.addEventListener('ready', function(event) {
+        var footerContent = '<div class="pdf-footer">Your footer text</div>';
+        document.querySelectorAll('.slide-background').forEach(function(slide) {
+            slide.innerHTML += footerContent;
+        });
+    });
+}
+</script>
+<h1>Adapt LLM to Time Series Anomaly Detection Domain</h1>
+<h2>LLM Workshop</h2>
 <p>25.08.11</p>
 <p>Jimin Park</p>
 <p><kbd><a href="mailto:gpfzl2@kaist.ac.kr">gpfzl2@kaist.ac.kr</a></kbd></p>
@@ -103,13 +114,13 @@
 <p>Definition</p>
 <ul>
 <li>
-<p>Time series <strong>anomalies</strong> $\doteq$</p>
+<p>Time series <kbd class="green">anomalies</kbd> $\doteq$</p>
 <ul>
 <li>Data points that deviate significantly from the expected pattern of the time series.</li>
 </ul>
 </li>
 <li>
-<p>An <strong>anomaly detection algorithm</strong> $\doteq$</p>
+<p>An <kbd class="green">anomaly detection algorithm</kbd> $\doteq$</p>
 <ul>
 <li>
 <p>Takes $X$ as input and outputs <em>binary labels</em> $\{y_1,\dots,y_T\}$.</p>
@@ -130,19 +141,19 @@
                 <h2>Anomaly Pattern Classification</h2>
 <ul>
 <li>
-<p>Trend anomalies $\doteq$</p>
+<p><kbd class="green">Trend</kbd> anomalies $\doteq$</p>
 <ul>
 <li>Sudden acceleration, deceleration, or reversal of the established trend.</li>
 </ul>
 </li>
 <li>
-<p>Frequency (Seasonal) anomalies $\doteq$</p>
+<p><kbd class="green">Frequency (Seasonal)</kbd> anomalies $\doteq$</p>
 <ul>
 <li>The periodic components of a time series deviate from the expected pattern.</li>
 </ul>
 </li>
 <li>
-<p>Contextual point anomalies $\doteq$</p>
+<p><kbd class="green">Contextual point</kbd> anomalies $\doteq$</p>
 <ul>
 <li>
 <p>Individual data points deviate from the expected pattern of the time series,</p>
@@ -151,13 +162,13 @@
 </ul>
 </li>
 <li>
-<p>Out-of-range anomalies $\doteq$</p>
+<p><kbd class="green">Out-of-range</kbd> anomalies $\doteq$</p>
 <ul>
 <li>Data points that lie far outside the normal range of values in a time series.</li>
 </ul>
 </li>
 <li>
-<p>Shapelet anomalies $\doteq$</p>
+<p><kbd class="green">Shapelet anomalies</kbd> $\doteq$</p>
 <ul>
 <li>Data points with dissimilar basic shapelet compared with the normal shapelet.</li>
 </ul>
@@ -204,11 +215,11 @@
                 <h2>Experiment results on univariate time series</h2>
 <ul>
 <li>
-<p>No evidence is found that explicit reasoning prompts via CoT improve</p>
+<p><kbd class="red">No evidence is found that explicit reasoning prompts via CoT improve</kbd></p>
 <p>LLMs’ performance in time series analysis.</p>
 </li>
 <li>
-<p>Time series anomalies are better detected by MLLMs as images than by LLMs as text.</p>
+<p>Time series anomalies are <kbd class="red">better detected by MLLMs as images</kbd> than by LLMs as text.</p>
 </li>
 <li>
 <p>LLMs perform worse when the input time series have more tokens.</p>
@@ -263,7 +274,7 @@
                 <h2>Experiment results on multivariate time series</h2>
 <ul>
 <li>
-<p>The variate-wise anomalies can be generally identified by MLLMs.</p>
+<p>The variate-wise anomalies can be <kbd class="red">generally identified by MLLMs</kbd>.</p>
 </li>
 <li>
 <p>Proprietary MLLMs outperform opensource models in the multivariate scenario.</p>
@@ -273,7 +284,8 @@
 <p>majority of variables within a multivaraite time series.</p>
 </li>
 <li>
-<p>MLLMs are sensitive to dimensionality and can generate hallucination for multivariate time series.</p>
+<p>MLLMs are <kbd class="red">sensitive to dimensionality</kbd> and can generate hallucination for</p>
+<p>multivariate time series.</p>
 </li>
 </ul>
 <div class="footer">
@@ -319,7 +331,7 @@
                 <h2>Follow the RLVR Framework</h2>
 <ul>
 <li>
-<p>A Reinforcement Learning with Verifiable Rewards (RLVR) $\doteq$</p>
+<p>A <kbd class="green">Reinforcement Learning with Verifiable Rewards (RLVR)</kbd> $\doteq$</p>
 <ul>
 <li>A method for training LLM on tasks with verifiable outcomes.</li>
 </ul>
@@ -396,13 +408,18 @@ $$</p>
 </ul>
 </li>
 <li>
-<p>RL Algorithm</p>
+<p>Training</p>
 <ul>
-<li>GRPO</li>
+<li>
+<p>RL Algorithm: GRPO</p>
+</li>
+<li>
+<p>Synthetic dataset: 400 series</p>
+</li>
 </ul>
 </li>
 <li>
-<p>Accept LoRA on all linear layers except visual layer.</p>
+<p>Accept LoRA (rank 16) on all linear layers except visual layer.</p>
 </li>
 <li>
 <p>Train the model with RTX 3090 $\times$ 4.</p>
@@ -413,6 +430,326 @@ $$</p>
         
             <section >
                 <h2>Experiment Results</h2>
+<p> </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.230</td>
+<td>0.204</td>
+<td>0.246</td>
+<td>0.279</td>
+<td>0.248</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.893</strong></td>
+<td><strong>0.875</strong></td>
+<td><strong>0.845</strong></td>
+<td><strong>0.858</strong></td>
+<td><strong>0.846</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.818</td>
+<td>0.610</td>
+<td>0.711</td>
+<td>0.769</td>
+<td>0.732</td>
+</tr>
+</tbody>
+</table>
+<p> </p>
+<ul>
+<li>
+<p>Qwen2.5-VL-3B-Instruct-RL is RL-trained LLM with all types of reward.</p>
+</li>
+<li>
+<p>Qwen2.5-VL-3B-Instruct-RL-wo-type is our RL-trained LLM without type reward.</p>
+</li>
+<li>
+<p><strong>Type-A</strong> and <strong>Type-F1</strong> represent the accuray and F1 scores for type anomaly classification, respectively.</p>
+</li>
+<li>
+<p><strong>Range-P</strong>, <strong>Range-R</strong>, and <strong>Range-F1</strong> represent the mean of affilation precision, recall, and F1, respectively.</p>
+</li>
+</ul>
+
+            </section>
+        
+            <section >
+                <h2>Experiment Results</h2>
+<p> </p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.230</td>
+<td>0.204</td>
+<td>0.246</td>
+<td>0.279</td>
+<td>0.248</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.893</strong></td>
+<td><strong>0.875</strong></td>
+<td><strong>0.845</strong></td>
+<td><strong>0.858</strong></td>
+<td><strong>0.846</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.818</td>
+<td>0.610</td>
+<td>0.711</td>
+<td>0.769</td>
+<td>0.732</td>
+</tr>
+</tbody>
+</table>
+<p> </p>
+<ul>
+<li>
+<p>Integrating the range score and classification score into the reward helps improve the anomaly detection.</p>
+<ul>
+<li>It implies that improving anomaly classification type ability also reinforce the anomaly detection.</li>
+</ul>
+</li>
+<li>
+<p>Only using range score in reward improves the anomaly classification performance.</p>
+</li>
+</ul>
+
+            </section>
+        
+            <section >
+                <h2>Experiment Results for Each Anomaly Type</h2>
+<p><strong>Contextual Point Anomaly</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.025</td>
+<td>0.011</td>
+<td>0.295</td>
+<td>0.377</td>
+<td>0.319</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.955</strong></td>
+<td><strong>0.636</strong></td>
+<td><strong>0.904</strong></td>
+<td><strong>0.915</strong></td>
+<td><strong>0.904</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.905</td>
+<td>0.371</td>
+<td>0.592</td>
+<td>0.718</td>
+<td>0.644</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Trend Anomaly</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.070</td>
+<td>0.037</td>
+<td>0.140</td>
+<td>0.199</td>
+<td>0.160</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.895</strong></td>
+<td><strong>0.888</strong></td>
+<td><strong>0.890</strong></td>
+<td><strong>0.891</strong></td>
+<td><strong>0.890</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.855</td>
+<td>0.567</td>
+<td>0.830</td>
+<td>0.870</td>
+<td>0.846</td>
+</tr>
+</tbody>
+</table>
+
+            </section>
+        
+            <section >
+                <h2>Experiment Results for Each Anomaly Type</h2>
+<p><strong>Frequency Anomaly</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.250</td>
+<td>0.073</td>
+<td>0.233</td>
+<td>0.317</td>
+<td>0.258</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.645</strong></td>
+<td><strong>0.224</strong></td>
+<td><strong>0.568</strong></td>
+<td><strong>0.657</strong></td>
+<td><strong>0.580</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.275</td>
+<td>0.119</td>
+<td>0.481</td>
+<td>0.626</td>
+<td>0.527</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Out of Range Anomaly</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Type-A</th>
+<th>Type-F1</th>
+<th>Range-P</th>
+<th>Range-R</th>
+<th>Range-F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct</td>
+<td>0.435</td>
+<td>0.148</td>
+<td>0.353</td>
+<td>0.292</td>
+<td>0.305</td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL</td>
+<td><strong>0.960</strong></td>
+<td><strong>0.955</strong></td>
+<td><strong>0.898</strong></td>
+<td>0.888</td>
+<td><strong>0.887</strong></td>
+</tr>
+<tr>
+<td>Qwen2.5-VL-3B-Instruct-RL-wo-type</td>
+<td>0.955</td>
+<td>0.950</td>
+<td>0.885</td>
+<td><strong>0.892</strong></td>
+<td>0.882</td>
+</tr>
+</tbody>
+</table>
+
+            </section>
+        
+            <section >
+                <h2>Output Samples</h2>
+<p><img src="images/2025-08-10-17-12-07.png" alt="" width="1920"></p>
+<div class="left-align">
+<p><code>&lt;think&gt; The time series data shows a clear sine wave pattern with some sudden spikes and drops. The most noticeable anomaly is a sharp spike at approximately timestamp 480, which is a clear out-of-range anomaly as it deviates significantly from the expected pattern. This spike is the only anomaly detected in the time series data. &lt;/think&gt;</code></p>
+<p><code>&lt;class&gt; Contextual Point &lt;/class&gt;</code></p>
+<p><code>&lt;range&gt; [[480, 490]] &lt;/range&gt;</code></p>
+</div>
+
+            </section>
+        
+            <section >
+                <h2>Output Samples</h2>
+<p><img src="images/2025-08-10-17-17-26.png" alt="" width="1920"></p>
+<div class="left-align">
+<p><code>&lt;think&gt; The time series data shows a clear upward trend over time, with the values fluctuating but generally increasing. The data points around timestamp 800 show a sudden and significant increase, which suggests a trend anomaly. The sudden spikes and drops are not out of the normal range, nor do they disrupt the periodicity or context of the data. Therefore, the most appropriate anomaly type for this data is &quot;Trend&quot;. &lt;/think&gt;</code></p>
+<p><code>&lt;class&gt; Trend &lt;/class&gt;</code></p>
+<p><code>&lt;range&gt; [[800, 1000]] &lt;/range&gt;</code></p>
+</div>
+
+            </section>
+        
+            <section >
+                <h2>Output Samples</h2>
+<p><img src="images/2025-08-10-17-19-36.png" alt="" width="1920"></p>
+<div class="left-align">
+<p><code>&lt;think&gt; The time series data shows a clear pattern of oscillations, which suggests that the anomalies detected might be related to frequency. The data points show sudden dips and rises, which could indicate frequency anomalies. These dips and rises disrupt the expected periodicity of the time series, making them frequency anomalies. &lt;/think&gt;</code></p>
+<p><code>&lt;class&gt; Frequency &lt;/class&gt;</code></p>
+<p><code>&lt;range&gt; [[450, 550]] &lt;/range&gt;</code></p>
+</div>
+
+            </section>
+        
+            <section >
+                <h2>Output Samples</h2>
+<p><img src="images/2025-08-10-17-22-23.png" alt="" width="1920"></p>
+<div class="left-align">
+<p><code>&lt;think&gt; The time series data shows sudden spikes and drops that are far outside the normal range of values, which are characteristic of Out of Range Anomalies. These spikes and drops are not part of a trend, frequency, or contextual pattern, but rather deviations from the expected normal behavior. &lt;/think&gt;</code></p>
+<p><code>&lt;class&gt; Out of Range &lt;/class&gt;</code></p>
+<p><code>&lt;range&gt; [[250, 270], [275, 285], [750, 770], [900, 920]] &lt;/range&gt;</code></p>
+</div>
 
             </section>
         
@@ -424,8 +761,14 @@ $$</p>
 <p>using reinforcement learning.</p>
 </li>
 <li>
-<p>Adapt RLVR framework to time series anomaly detection using appropriately</p>
-<p>desinged reward.</p>
+<p>Adapt RLVR framework to time series anomaly detection task using</p>
+<p>appropriately desinged reward.</p>
+<ul>
+<li>
+<p>Not only using affilation scores, but also incoporating anomaly type</p>
+<p>classification reward, which helps reinforcing the reasoning ability of LLM.</p>
+</li>
+</ul>
 </li>
 </ul>
 
@@ -434,6 +777,9 @@ $$</p>
             <section >
                 <h1>Future Works</h1>
 <ul>
+<li>
+<p>Improve the performance for frequency anomaly type.</p>
+</li>
 <li>
 <p>Improve reasoning on multivariate time series.</p>
 </li>
