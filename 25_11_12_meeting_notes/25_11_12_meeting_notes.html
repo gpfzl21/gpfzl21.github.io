@@ -1,0 +1,3109 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="25_11_12_meeting_notes_files/libs/clipboard/clipboard.min.js"></script>
+<script src="25_11_12_meeting_notes_files/libs/quarto-html/tabby.min.js"></script>
+<script src="25_11_12_meeting_notes_files/libs/quarto-html/popper.min.js"></script>
+<script src="25_11_12_meeting_notes_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="25_11_12_meeting_notes_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="25_11_12_meeting_notes_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="25_11_12_meeting_notes_files/libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.25">
+
+  <meta name="author" content="Jimin Park">
+  <title>Reinforce Reasoning of LLMs on Time Series Anomaly Detection</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="25_11_12_meeting_notes_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="25_11_12_meeting_notes_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="25_11_12_meeting_notes_files/libs/revealjs/dist/theme/quarto-f1586767c9db5c1abe1b5b03d702bf45.css">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="25_11_12_meeting_notes_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <!-- _guide-flag.html -->
+
+  <script>
+
+  (function () {
+
+    const isVSCode =
+
+      location.protocol === 'vscode-webview:' ||
+
+      document.baseURI.startsWith('vscode-webview://') ||
+
+      typeof window.acquireVsCodeApi === 'function' ||
+
+      /\b(vscode|electron)\b/i.test(navigator.userAgent);
+
+  
+
+    if (isVSCode) {
+
+      const add = () => document.body.classList.add('guide');
+
+      if (document.readyState === 'loading') {
+
+        document.addEventListener('DOMContentLoaded', add, { once: true });
+
+      } else {
+
+        add();
+
+      }
+
+    }
+
+  })();
+
+  </script>
+
+  <style>
+  #title-slide .quarto-title-author-email { 
+    font-size: 1em;
+  }
+  </style>
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Reinforce Reasoning of LLMs on Time Series Anomaly Detection</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Jimin Park 
+</div>
+<div class="quarto-title-author-email">
+<a href="mailto:gpfzl2@kaist.ac.kr">gpfzl2@kaist.ac.kr</a>
+</div>
+</div>
+</div>
+
+</section>
+<section>
+<section id="brief-review-of-previous-presentations" class="title-slide slide level1 center">
+<h1>Brief Review of Previous presentations</h1>
+
+</section>
+<section id="anomaly-pattern-classification" class="slide level2 center">
+<h2>Anomaly Pattern Classification</h2>
+
+<img data-src="images/2025-11-06-17-27-02.png" class="r-strecth r-stretch"><div class="footer">
+<p><a href="https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/ec5decca5ed3d6b8079e2e7e7bacc9f2-Paper-round1.pdf">(NeurIPS 2021) Revisiting Time Series Outlier Detection: Definitions and Benchmarks</a></p>
+</div>
+</section>
+<section id="anomaly-pattern-classification-1" class="slide level2 center">
+<h2>Anomaly Pattern Classification</h2>
+
+<img data-src="images/2025-11-06-17-29-23.png" class="r-stretch"><div class="footer">
+<p><a href="https://arxiv.org/abs/2211.05244">(CSUR) Deep Learning for Time Series Anomaly Detection: A Survey</a></p>
+</div>
+</section>
+<section id="affiliation-metric" class="slide level2 center">
+<h2>Affiliation Metric</h2>
+<h3 id="st.-local-affiliation-to-the-clostest-ground-truth">1st. Local affiliation to the clostest ground truth</h3>
+
+<img data-src="images/2025-11-06-17-38-21.png" class="r-stretch"><div class="footer">
+<p><a href="https://arxiv.org/abs/2206.13167">(KDD 2022) Local Evaluation of Time Series Anomaly Detection Algorithms</a></p>
+</div>
+</section>
+<section id="affiliation-metric-1" class="slide level2 center">
+<h2>Affiliation Metric</h2>
+<h3 id="nd.-normalization-distance-on-each-local-affiliation">2nd. Normalization distance on each local affiliation</h3>
+
+<img data-src="images/2025-11-06-17-47-59.png" width="1000" class="r-stretch"><p><span class="math display">\[
+P _{\text{precision} _j} = \frac{1}{| \text{pred} \cap I _j |} \int _{x\in \text{pred} \cap I _j} \bar{F} _{\text{precision} _j} (\text{dist} (x, \text{gt} _j))
+\]</span></p>
+<div class="footer">
+<p><a href="https://arxiv.org/abs/2206.13167">(KDD 2022) Local Evaluation of Time Series Anomaly Detection Algorithms</a></p>
+</div>
+</section>
+<section id="affiliation-metric-2" class="slide level2 center">
+<h2>Affiliation Metric</h2>
+<h3 id="rd.-averaging">3rd. Averaging</h3>
+<p><span class="math display">\[
+\begin{aligned}
+P _{\text{precision}} &amp; = \frac{1}{|S|} \sum _{j\in S} P _{\text{precision} _j} \\\\
+P _{\text{recall}} &amp; = \frac{1}{|S|} \sum _{j\in S} P _{\text{recall} _j}
+\end{aligned}
+\]</span></p>
+<div class="footer">
+<p><a href="https://arxiv.org/abs/2206.13167">(KDD 2022) Local Evaluation of Time Series Anomaly Detection Algorithms</a></p>
+</div>
+</section>
+<section id="llms-on-time-series-anomaly-detection" class="slide level2 center">
+<h2>LLMs on Time Series Anomaly Detection</h2>
+<h3 id="structured-output">Structured Output</h3>
+<p><span class="math display">\[
+\underbrace{\mathtt{\langle think \rangle \cdots \langle /think \rangle}} _ {\text{Reasoning}} \quad
+\underbrace{\mathtt{\langle class \rangle \cdots \langle /class \rangle}} _ {\text{Anomaly Type}} \quad
+\underbrace{\mathtt{\langle location \rangle \cdots \langle /location \rangle}} _ {\text{Anomaly Location}} \quad
+\]</span></p>
+<ul>
+<li><p><code>think</code> block expresses reasoning on anomaly detection.</p></li>
+<li><p><code>class</code> block expresses the type of anomaly.</p></li>
+<li><p><code>location</code> block expresses the location of anomalies.</p></li>
+</ul>
+</section>
+<section id="llms-on-time-series-anomaly-detection-1" class="slide level2 center">
+<h2>LLMs on Time Series Anomaly Detection</h2>
+<h3 id="outcome-reward-modeling">Outcome reward modeling</h3>
+<p><span class="math display">\[
+\begin{aligned}
+r(\hat y, y) = \ &amp; w _\text{format} \cdot \text{format_score} (\hat y) \\
+&amp; + w _\text{class} \cdot \text{class_score} (\hat y, y) \\
+&amp; + w _\text{location} \cdot \text{location_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\text{format_score}\)</span> allows soft rewards (i.e., not a binary value).</p></li>
+<li><p><span class="math inline">\(\text{class_score} = \mathbb I \big(\text{class}(\hat y) = \text{class}(y)\big)\)</span></p></li>
+<li><p><span class="math inline">\(\text{location_score} = \text{Affiliation-F1}\big(\text{location}(\hat y), \text{location}(y)\big)\)</span></p></li>
+</ul>
+</section></section>
+<section>
+<section id="process-supervision-llm-rlvr-on-time-series-anomaly-detection" class="title-slide slide level1 center">
+<h1>Process Supervision LLM RLVR on Time Series Anomaly Detection</h1>
+
+</section>
+<section id="motivation" class="slide level2 center">
+<h2>Motivation</h2>
+<p>Can we enhance the reasoning more using “process reward” instead of “outcome reward”?</p>
+</section>
+<section id="revisit-process-supervision-rl-with-grpo" class="slide level2 center">
+<h2>Revisit: Process Supervision RL with GRPO</h2>
+<ol type="1">
+<li><p>Given question <span class="math inline">\(q\)</span> and <span class="math inline">\(G\)</span> sampled outputs <span class="math inline">\(\{ o _1, \dots, o_G \}\)</span>.</p></li>
+<li><p>Use process reward model to score each step of the outputs, yielding corresponding</p>
+<p>rewards:</p>
+<p><span class="math display">\[
+\mathbf R=\{ \{r _1^{index(1)}, \dots, r _1^{index(K _1)}\}, \dots, \{r _G^{index(1)}, \dots, r _G^{index(K _G)}\} \}.
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(index(j)\)</span> is the end token index of the <span class="math inline">\(j\)</span>-th step.</p></li>
+<li><p><span class="math inline">\(K_i\)</span> is the total number of steps in the <span class="math inline">\(i\)</span>-th output.</p></li>
+</ul></li>
+</ol>
+<div class="footer">
+<p><a href="https://arxiv.org/abs/2402.03300">DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models</a></p>
+</div>
+</section>
+<section id="revisit-process-supervision-rl-with-grpo-1" class="slide level2 center">
+<h2>Revisit: Process Supervision RL with GRPO</h2>
+<ol start="3" type="1">
+<li><p>Normalize these rewards with the average and the standard deviation:</p>
+<p><span class="math display">\[
+\tilde r _i^{index(j)} = \frac{r _i^{index(j)} - \text{mean}(\mathbf R)}{\text{std}(\mathbf R)}.
+\]</span></p></li>
+<li><p><strong>Process supervision</strong> calculates the advantage of each token as the sum of the</p>
+<p>normalized rewards from the following steps:</p>
+<p><span class="math display">\[
+\hat A_{i,t}=\sum_{j:index(j)\ge t}\tilde r_i^{index(j)}.
+\]</span></p></li>
+</ol>
+<div class="footer">
+<p><a href="https://arxiv.org/abs/2402.03300">DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models</a></p>
+</div>
+</section>
+<section id="process-supervision-rlvr-on-anomaly-detection" class="slide level2 center">
+<h2>Process-Supervision RLVR on Anomaly Detection</h2>
+<ul>
+<li><p>Instead of using process reward model,</p>
+<ul>
+<li><p>break down anomaly detection process manually,</p></li>
+<li><p>and use <strong>verifiable reward</strong> on each step.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="break-down-anomaly-detection-step-by-step" class="slide level2 center">
+<h2>Break Down Anomaly Detection Step-By-Step</h2>
+<ol type="1">
+<li><p>Coarse Classification</p>
+<ul>
+<li><p>Select and output ONLY ONE most appropriate anomaly type from the coarse categories.</p></li>
+<li><p>The type MUST be one of:</p>
+<ul>
+<li><code>Normal</code>, <code>Point-wise</code>, <code>Pattern-wise</code>.</li>
+</ul></li>
+</ul></li>
+<li><p>Fine-grained Classification</p>
+<ul>
+<li><p>ONLY perform this step if the result of step 1 is <code>Point-wise</code> or <code>Pattern-wise</code>.</p></li>
+<li><p>Output EXACTLY ONE sub-type based on the result of step 1.</p></li>
+<li><p>The sub-type MUST be one of:</p>
+<ul>
+<li><code>Global</code>, <code>Contextual</code>, <code>Shapelet</code>, <code>Seasonal</code>, <code>Trend</code>.</li>
+</ul></li>
+</ul></li>
+<li><p>Localization</p>
+<ul>
+<li>Justify the anomaly location by referencing specific indices/ranges in the evidence.</li>
+</ul></li>
+</ol>
+</section>
+<section id="structured-output-1" class="slide level2 center">
+<h2>Structured Output</h2>
+<p><br> <span class="math display">\[
+\underbrace{\mathtt{\langle think1 \rangle \cdots \langle /think1 \rangle}} _ {\text{Reasoning}} \quad \underbrace{\mathtt{\langle class1 \rangle \cdots \langle /class1 \rangle}} _ {\text{Anomaly Type 1}} \\
+\underbrace{\mathtt{\langle think2 \rangle \cdots \langle /think2 \rangle}} _ {\text{Reasoning}} \quad \underbrace{\mathtt{\langle class2 \rangle \cdots \langle /class2 \rangle}} _ {\text{Anomaly Type 2}} \\
+\underbrace{\mathtt{\langle think3 \rangle \cdots \langle /think3 \rangle}} _ {\text{Reasoning}} \quad \underbrace{\mathtt{\langle location \rangle \cdots \langle /location \rangle}} _ {\text{Anomaly Location}}
+\]</span> <br> Skip <code>think2</code> and <code>class2</code> when <code>class1</code> is <code>Normal</code>.</p>
+</section>
+<section id="process-reward-step-1" class="slide level2 center">
+<h2>Process reward: Step 1</h2>
+<p><br> <span class="math display">\[
+\begin{aligned}
+r ^{(1)} (\hat y, y) =  &amp; \ w _\text{format1} \cdot \text{format1_score} (\hat y) \\
+&amp; + w _{\text{class1}} \cdot \text{class1_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\text{class1_score} = \mathbb I \big(\text{class1}(\hat y) = \text{class1}(y)\big)\)</span></li>
+</ul>
+</section>
+<section id="process-reward-step-2" class="slide level2 center">
+<h2>Process reward: Step 2</h2>
+<p><br></p>
+<p><span class="math display">\[
+\begin{aligned}
+r ^{(2)} (\hat y, y) =  &amp; \ w _\text{format2} \cdot \text{format2_score} (\hat y) \\
+&amp; + w _{\text{class2}} \cdot \text{class2_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p><span class="math display">\[\text{class2_score} = \mathbb I \big(\text{class2}(\hat y) = \text{class2}(y)\big) \times \mathbb I\big(\text{class2}(\hat y) \in \text{class1}(\hat y)\big)\]</span></p>
+<ul>
+<li>We multiply <span class="math inline">\(\mathbb I\big(\text{class2}(\hat y) \in \text{class1}(\hat y)\big)\)</span> to check validity of process.</li>
+</ul></li>
+</ul>
+</section>
+<section id="process-reward-step-3" class="slide level2 center">
+<h2>Process reward: Step 3</h2>
+<p><br></p>
+<p><span class="math display">\[
+\begin{aligned}
+r ^{(3)} (\hat y, y) =  &amp; \ w _\text{format3} \cdot \text{format3_score} (\hat y) \\
+&amp; + w _{\text{location}} \cdot \text{location_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\text{location_score} = \text{Affiliation-F1}\big(\text{location}(\hat y), \text{location}(y)\big)\)</span></li>
+</ul>
+</section>
+<section id="experiment-setting" class="slide level2 center">
+<h2>Experiment Setting</h2>
+<ul>
+<li><p>Base Model</p>
+<ul>
+<li>Qwen2.5-VL-7b</li>
+</ul></li>
+<li><p>Dataset</p>
+<ul>
+<li>Synthetic dataset containing anomalies and based on various time series.</li>
+</ul></li>
+<li><p>Training using verl, the RL training library for LLMs.</p>
+<ul>
+<li><p>Accept LoRA with rank 16 on all linear layers except visual layers.</p></li>
+<li><p>Training until there is no performance improvements.</p></li>
+<li><p>Outcome reward based model takes 20 epochs.</p></li>
+<li><p>Process reward based model takes 15 epochs.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="experiment-result" class="slide level2 center">
+<h2>Experiment Result</h2>
+<p><br></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">class_acc</th>
+<th style="text-align: center;">affi_prec</th>
+<th style="text-align: center;">affi_recall</th>
+<th style="text-align: center;">affi_f1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>outcome_reward</td>
+<td style="text-align: center;"><strong>0.85856</strong></td>
+<td style="text-align: center;">0.827928</td>
+<td style="text-align: center;">0.821378</td>
+<td style="text-align: center;">0.81862</td>
+</tr>
+<tr class="even">
+<td>process_reward</td>
+<td style="text-align: center;">0.85791</td>
+<td style="text-align: center;"><strong>0.85857</strong></td>
+<td style="text-align: center;"><strong>0.86541</strong></td>
+<td style="text-align: center;"><strong>0.8554</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-anomaly-types" class="slide level2 center">
+<h2>Analysis on Anomaly Types</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-7pq3{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:top}
+.tg .tg-fmsy{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-89pd{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-1pbj{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-7pq3">
+</th>
+<th class="tg-fmsy" colspan="4">
+normal
+</th>
+<th class="tg-fmsy" colspan="4">
+seasonal
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+outcome_reward
+</td>
+<td class="tg-fmsy">
+0.84473
+</td>
+<td class="tg-fmsy">
+0.84473
+</td>
+<td class="tg-fmsy">
+0.84473
+</td>
+<td class="tg-fmsy">
+0.84473
+</td>
+<td class="tg-fmsy">
+0.9082
+</td>
+<td class="tg-89pd">
+0.895071
+</td>
+<td class="tg-89pd">
+0.932244
+</td>
+<td class="tg-89pd">
+0.910779
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+process_reward
+</td>
+<td class="tg-89pd">
+0.599609
+</td>
+<td class="tg-89pd">
+0.599609
+</td>
+<td class="tg-89pd">
+0.599609
+</td>
+<td class="tg-89pd">
+0.599609
+</td>
+<td class="tg-89pd">
+0.879883
+</td>
+<td class="tg-fmsy">
+0.90085
+</td>
+<td class="tg-fmsy">
+0.95972
+</td>
+<td class="tg-fmsy">
+0.92561
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-fmsy" colspan="4">
+trend
+</td>
+<td class="tg-fmsy" colspan="4">
+shapelet
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+outcome_reward
+</td>
+<td class="tg-89pd">
+0.825195
+</td>
+<td class="tg-89pd">
+0.805745
+</td>
+<td class="tg-89pd">
+0.782903
+</td>
+<td class="tg-89pd">
+0.781175
+</td>
+<td class="tg-89pd">
+0.754883
+</td>
+<td class="tg-89pd">
+0.896507
+</td>
+<td class="tg-89pd">
+0.899268
+</td>
+<td class="tg-89pd">
+0.895923
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+process_reward
+</td>
+<td class="tg-fmsy">
+0.96387
+</td>
+<td class="tg-fmsy">
+0.84975
+</td>
+<td class="tg-fmsy">
+0.91802
+</td>
+<td class="tg-fmsy">
+0.87269
+</td>
+<td class="tg-fmsy">
+0.92285
+</td>
+<td class="tg-fmsy">
+0.96083
+</td>
+<td class="tg-fmsy">
+0.97362
+</td>
+<td class="tg-fmsy">
+0.96609
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-fmsy" colspan="4">
+global
+</td>
+<td class="tg-fmsy" colspan="4">
+contextual
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+outcome_reward
+</td>
+<td class="tg-fmsy">
+1
+</td>
+<td class="tg-89pd">
+0.77664
+</td>
+<td class="tg-89pd">
+0.777708
+</td>
+<td class="tg-89pd">
+0.775806
+</td>
+<td class="tg-fmsy">
+0.81836
+</td>
+<td class="tg-89pd">
+0.748878
+</td>
+<td class="tg-89pd">
+0.691421
+</td>
+<td class="tg-89pd">
+0.703313
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+process_reward
+</td>
+<td class="tg-89pd">
+0.998047
+</td>
+<td class="tg-fmsy">
+0.97677
+</td>
+<td class="tg-fmsy">
+0.96237
+</td>
+<td class="tg-fmsy">
+0.9669
+</td>
+<td class="tg-89pd">
+0.783203
+</td>
+<td class="tg-fmsy">
+0.8636
+</td>
+<td class="tg-fmsy">
+0.7791
+</td>
+<td class="tg-fmsy">
+0.80148
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-base-time-series" class="slide level2 center">
+<h2>Analysis on Base Time Series</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-1pbj{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-fmsy{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-89pd{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-7pq3{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:top}
+.tg .tg-am8o{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-1pbj">
+</th>
+<th class="tg-fmsy" colspan="4">
+sine
+</th>
+<th class="tg-fmsy" colspan="4">
+triangle_wave
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-1pbj">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+outcome_reward
+</td>
+<td class="tg-fmsy">
+0.85026
+</td>
+<td class="tg-89pd">
+0.793701
+</td>
+<td class="tg-89pd">
+0.813495
+</td>
+<td class="tg-89pd">
+0.797542
+</td>
+<td class="tg-89pd">
+0.827474
+</td>
+<td class="tg-89pd">
+0.77985
+</td>
+<td class="tg-89pd">
+0.773077
+</td>
+<td class="tg-89pd">
+0.770365
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+process_reward
+</td>
+<td class="tg-89pd">
+0.846354
+</td>
+<td class="tg-fmsy">
+0.83913
+</td>
+<td class="tg-fmsy">
+0.85163
+</td>
+<td class="tg-fmsy">
+0.83911
+</td>
+<td class="tg-fmsy">
+0.85286
+</td>
+<td class="tg-fmsy">
+0.8292
+</td>
+<td class="tg-fmsy">
+0.84675
+</td>
+<td class="tg-fmsy">
+0.83132
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-am8o" colspan="4">
+square_wave
+</td>
+<td class="tg-am8o" colspan="4">
+sawtooth_wave
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+outcome_reward
+</td>
+<td class="tg-fmsy">
+0.89779
+</td>
+<td class="tg-fmsy">
+0.87727
+</td>
+<td class="tg-89pd">
+0.869635
+</td>
+<td class="tg-fmsy">
+0.87003
+</td>
+<td class="tg-89pd">
+0.858724
+</td>
+<td class="tg-89pd">
+0.860895
+</td>
+<td class="tg-89pd">
+0.829307
+</td>
+<td class="tg-89pd">
+0.836545
+</td>
+</tr>
+<tr>
+<td class="tg-7pq3">
+process_reward
+</td>
+<td class="tg-89pd">
+0.859375
+</td>
+<td class="tg-89pd">
+0.858771
+</td>
+<td class="tg-fmsy">
+0.86367
+</td>
+<td class="tg-89pd">
+0.855888
+</td>
+<td class="tg-fmsy">
+0.87305
+</td>
+<td class="tg-fmsy">
+0.90718
+</td>
+<td class="tg-fmsy">
+0.89958
+</td>
+<td class="tg-fmsy">
+0.89526
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="output-example" class="slide level2 center">
+<h2>Output Example</h2>
+
+<img data-src="images/2025-11-09-17-22-29.png" class="r-stretch"><div class="code-3xl">
+<div class="code-h-70">
+<pre><code>&lt;think2&gt; The pattern-wise anomaly is characterized by a change in the underlying trend (τ) of the series, which is evident in the sudden and sustained drop in the values. The series returns to its normal pattern after the anomaly, indicating a shift in the trend rather than a point-wise deviation.&lt;/think2&gt;
+
+&lt;class2&gt; Trend &lt;/class2&gt;
+
+&lt;think3&gt; The anomaly is detected in the middle of the series, where the values drop significantly and then return to the normal pattern. This suggests that the anomaly is located in the subsequences where the trend changes.&lt;/think3&gt;
+
+&lt;location&gt; [[430, 450], [940, 960]] &lt;/location&gt;</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="llms-on-time-series-multi-class-anomaly-detection" class="title-slide slide level1 center">
+<h1>LLMs on Time Series Multi-Class Anomaly Detection</h1>
+
+</section>
+<section id="motivation-1" class="slide level2 center">
+<h2>Motivation</h2>
+<ul>
+<li><p>In real-world time series, <span class="red">multiple types of anomalies</span> can occur simultaneously.</p></li>
+<li><p>With the method we previously used, it seems <span class="blue">difficult to effectively detect multiple types of anomalies</span>.</p>
+<ul>
+<li>Our experimental results confirm this limitation.</li>
+</ul></li>
+<li><p>Also, there are <span class="blue">no metrics</span> to evaluate <span class="blue">class accuracy</span> or the <span class="blue">performance of class-aware anomaly detection performance</span> when there are multiple types of anomalies.</p></li>
+<li><p>So, when various kinds of anomalies appear, how can we strengthen the reasoning process?</p></li>
+</ul>
+</section>
+<section id="structured-output-2" class="slide level2 center">
+<h2>Structured Output</h2>
+<div class="code-3xl">
+<div class="code-stretch">
+<pre><code>&lt;think&gt;
+...
+&lt;/think&gt;
+&lt;anomaly&gt;
+[
+  {"type": t_1,
+   "locations": [{"start": s_11, "end": e_11}, {"start": s_12, "end": e_12}, ...]},
+  {"type": t_2,
+   "locations": [{"start": s_21, "end": e_21}, {"start": s_22, "end": e_22}, ...]},
+  ...
+]
+&lt;/anomaly&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="difficulty-in-multiclass-anomalies-detection" class="slide level2 center">
+<h2>Difficulty in Multiclass Anomalies Detection</h2>
+<h3 id="anomaly-type">1 anomaly type</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">affi_prec</th>
+<th style="text-align: center;">affi_recall</th>
+<th style="text-align: center;">affi_f1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>base</td>
+<td style="text-align: center;">0.33634029</td>
+<td style="text-align: center;">0.28213659</td>
+<td style="text-align: center;">0.29783494</td>
+</tr>
+<tr class="even">
+<td>outcome_reward</td>
+<td style="text-align: center;">0.70769185</td>
+<td style="text-align: center;">0.72150965</td>
+<td style="text-align: center;">0.7081522</td>
+</tr>
+<tr class="odd">
+<td>process_reward</td>
+<td style="text-align: center;"><strong>0.84455437</strong></td>
+<td style="text-align: center;"><strong>0.85952687</strong></td>
+<td style="text-align: center;"><strong>0.8435712</strong></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<h3 id="anomaly-types">2 anomaly types</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">affi_prec</th>
+<th style="text-align: center;">affi_recall</th>
+<th style="text-align: center;">affi_f1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>base</td>
+<td style="text-align: center;">0.42039654</td>
+<td style="text-align: center;">0.23908425</td>
+<td style="text-align: center;">0.29160892</td>
+</tr>
+<tr class="even">
+<td>outcome_reward</td>
+<td style="text-align: center;">0.7184274</td>
+<td style="text-align: center;">0.5266675</td>
+<td style="text-align: center;">0.59161479</td>
+</tr>
+<tr class="odd">
+<td>process_reward</td>
+<td style="text-align: center;"><strong>0.73050845</strong></td>
+<td style="text-align: center;"><strong>0.58263188</strong></td>
+<td style="text-align: center;"><strong>0.63214183</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="difficulty-in-multiclass-anomalies-detection-1" class="slide level2 center">
+<h2>Difficulty in Multiclass Anomalies Detection</h2>
+<h3 id="anomaly-types-1">3 anomaly types</h3>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 23%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">affi_prec</th>
+<th style="text-align: center;">affi_recall</th>
+<th style="text-align: center;">affi_f1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>base</td>
+<td style="text-align: center;">0.53396651</td>
+<td style="text-align: center;">0.19754696</td>
+<td style="text-align: center;">0.2774276</td>
+</tr>
+<tr class="even">
+<td>outcome_reward</td>
+<td style="text-align: center;">0.66467482</td>
+<td style="text-align: center;">0.35377235</td>
+<td style="text-align: center;">0.44964107</td>
+</tr>
+<tr class="odd">
+<td>process_reward</td>
+<td style="text-align: center;"><strong>0.64661129</strong></td>
+<td style="text-align: center;"><strong>0.3750176</strong></td>
+<td style="text-align: center;"><strong>0.45770844</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Further, they are not good at detecting “all” types of anomalies in data.</li>
+</ul>
+</section>
+<section id="difficulty-in-multiclass-anomalies-detection-output-example" class="slide level2 center">
+<h2>Difficulty in Multiclass Anomalies Detection: Output Example</h2>
+
+<img data-src="images/2025-11-06-20-31-55.png" class="r-stretch"><div class="code-3xl">
+<div class="code-h-70">
+<pre><code>&lt;think&gt;
+The provided time series chart shows a pattern of oscillations with a consistent frequency and amplitude. However, there are segments where the amplitude of the oscillations decreases significantly, indicating a change in the underlying trend. This suggests a trend anomaly where the series exhibits a shift in its underlying trend, but the basic shape and frequency remain normal.
+
+The anomalies are located in the following intervals:
+- The first anomaly is from the 85th to the 875th point, where the amplitude of the oscillations decreases.
+- The second anomaly is from the 1200th to the 1340th point, where the amplitude of the oscillations decreases again.
+
+This is a pattern-wise anomaly, specifically a Trend Anomaly, as the basic shape and frequency of the oscillations remain normal, but the trend changes.
+&lt;/think&gt;
+
+&lt;anomaly&gt;
+[{"type": "Trend", "locations": [{"start": 85, "end": 875}, {"start": 1200, "end": 1340}]}]
+&lt;/anomaly&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="class-accuracy-for-multi-class-anomaly-detection" class="slide level2 center">
+<h2>Class Accuracy for Multi-class Anomaly Detection</h2>
+<h3 id="st.-local-affiliation-to-the-clostest-ground-truth-1">1st. Local affiliation to the clostest ground truth</h3>
+
+<img data-src="images/2025-11-06-21-24-05.png" width="1200" class="r-stretch"></section>
+<section id="class-accuracy-for-multi-class-anomaly-detection-1" class="slide level2 center">
+<h2>Class Accuracy for Multi-class Anomaly Detection</h2>
+<h3 id="nd.-compute-class-accuracy-in-each-affiliation-zone">2nd. Compute class accuracy in each affiliation zone</h3>
+
+<img data-src="images/2025-11-06-21-38-31.png" width="1100" class="r-stretch"><p><span class="math display">\[
+\frac{\text{# of pred events that match class of gt event in the affiliation zone}}{\text{# of pred events in the affiliation zone}}
+\]</span></p>
+</section>
+<section id="class-accuracy-for-multi-class-anomaly-detection-2" class="slide level2 center">
+<h2>Class Accuracy for Multi-class Anomaly Detection</h2>
+<h3 id="rd.-averaging-1">3rd. Averaging</h3>
+<div class="columns">
+<div class="column" style="width:70%;">
+<p><img data-src="images/2025-11-06-21-38-31.png" width="1200"></p>
+</div><div class="column" style="width:30%;">
+<p><span class="math display">\[
+\begin{aligned}
+&amp; C _{\text{accuracy}} \\\\
+&amp; = \frac{1}{|S|} \sum _{j\in S} C _{\text{accuracy} _j} \\\\
+&amp; = \frac{1}{3} \left( \frac{1}{3} + \frac{2}{2} + \frac{2}{3} \right) \\\\
+&amp; = \frac{2}{3}
+\end{aligned}
+\]</span></p>
+</div></div>
+</section>
+<section id="class-aware-local-evaluation-metric" class="slide level2 center">
+<h2>Class-aware Local Evaluation Metric</h2>
+<ul>
+<li><p>Just adapt affiliation metrics to class-aware affiliation metrics as below:</p>
+<p><span class="math display">\[
+  \begin{aligned}
+  CP _{\text{precision} _j} \triangleq \frac{1}{|\text{pred} \cap I _j|} \int _{x\in \text{pred}\cap I _j} &amp; \big( w\cdot \mathbb I (\text{type_of_}x = \text{type_of_}\mathrm{gt} _j) + (1-w) \big) \\\\
+  &amp; \ \times \bar{F} _{\text{precision} _j} \left(\text{dist}(x, \text{gt} _j) \right)dx.
+  \end{aligned}
+  \]</span></p>
+<ul>
+<li><p><span class="math inline">\(w\)</span> controls the impact of class in the metric.</p></li>
+<li><p>If <span class="math inline">\(w=0\)</span>, then it is just affiliation precision</p></li>
+<li><p>We can adapt affiliation recall to class-aware affiliation recall similarly.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="outcome-reward-modeling-option-1" class="slide level2 center">
+<h2>Outcome reward modeling: Option 1</h2>
+<p><span class="math display">\[
+\begin{aligned}
+r(\hat y, y) = &amp; \ w _\text{format} \cdot \text{format_score} (\hat y) \\
+&amp; + w _\text{class} \cdot \text{class_score} (\hat y, y) \\
+&amp; + w _\text{location} \cdot \text{location_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\text{format_score}\)</span> allows soft rewards (i.e., not a binary value).</p></li>
+<li><p><span class="math inline">\(\text{class_score} = C _{\text{accuracy}}\big(\text{class}(\hat y), \text{class}(y)\big)\)</span></p></li>
+<li><p><span class="math inline">\(\text{location_score} = \text{Affiliation-F1}\big(\text{location}(\hat y), \text{location}(y)\big)\)</span></p></li>
+</ul>
+</section>
+<section id="outcome-reward-modeling-option-2" class="slide level2 center">
+<h2>Outcome reward modeling: Option 2</h2>
+<p><span class="math display">\[
+\begin{aligned}
+r(\hat y, y) = &amp; \ w _\text{format} \cdot \text{format_score} (\hat y) \\\\
+&amp; + w _\text{ca_location} \cdot \text{ca_location_score} (\hat y, y)
+\end{aligned}
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\text{format_score}\)</span> allows soft rewards (i.e., not a binary value).</p></li>
+<li><p><span class="math inline">\(\text{ca_location_score} = CP _{\text{precision}}\big( \text{class_location}(\hat y), \text{class_location}(y) \big)\)</span></p></li>
+</ul>
+</section>
+<section id="experiment-setting-1" class="slide level2 center">
+<h2>Experiment Setting</h2>
+<ul>
+<li><p>Base Model</p>
+<ul>
+<li>Qwen2.5-VL-7b</li>
+</ul></li>
+<li><p>Dataset</p>
+<ul>
+<li><p>Synthetic dataset containing single, double, and triple types of anomalies.</p></li>
+<li><p>To get the experiment results faster, we only used data based on sine time series.</p></li>
+</ul></li>
+<li><p>Training using verl, the RL training library for LLMs.</p>
+<ul>
+<li>Accept LoRA with rank 16 on all linear layers except visual layers.</li>
+</ul></li>
+</ul>
+</section>
+<section id="examples-of-data" class="slide level2 center">
+<h2>Examples of Data</h2>
+<p><img data-src="images/2025-11-08-15-08-21.png"> seasonal_contextual</p>
+<p><img data-src="images/2025-11-08-15-10-06.png"> trend_shapelet_global</p>
+<p><img data-src="images/2025-11-08-15-11-18.png"> seaosnal_trend_shapelet</p>
+</section>
+<section id="experiment-results" class="slide level2 center">
+<h2>Experiment Results</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-vwnj{border-color:#ffffff;font-size:36px;text-align:left;vertical-align:bottom}
+.tg .tg-uegx{border-color:#ffffff;font-size:36px;text-align:center;vertical-align:bottom}
+.tg .tg-9srb{border-color:#ffffff;font-size:36px;text-align:center;vertical-align:middle}
+.tg .tg-a06g{border-color:#ffffff;font-size:36px;font-weight:bold;text-align:center;vertical-align:middle}
+.tg .tg-vb5t{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:36px;text-align:center;vertical-align:middle}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-vwnj">
+</th>
+<th class="tg-uegx">
+class
+</th>
+<th class="tg-uegx">
+affi_prec
+</th>
+<th class="tg-uegx">
+affi_recall
+</th>
+<th class="tg-uegx">
+affi_f1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-vwnj">
+base
+</td>
+<td class="tg-9srb">
+0.15003352
+</td>
+<td class="tg-9srb">
+0.49386263
+</td>
+<td class="tg-9srb">
+0.2581274
+</td>
+<td class="tg-9srb">
+0.31853885
+</td>
+</tr>
+<tr>
+<td class="tg-vwnj">
+outcome_reward
+</td>
+<td class="tg-9srb">
+0.37740859
+</td>
+<td class="tg-9srb">
+0.69169991
+</td>
+<td class="tg-9srb">
+0.48758831
+</td>
+<td class="tg-9srb">
+0.55140646
+</td>
+</tr>
+<tr>
+<td class="tg-vwnj">
+process_reward
+</td>
+<td class="tg-a06g">
+0.4199203
+</td>
+<td class="tg-a06g">
+0.7234432
+</td>
+<td class="tg-a06g">
+0.541295
+</td>
+<td class="tg-a06g">
+0.5969736
+</td>
+</tr>
+<tr>
+<td class="tg-vwnj">
+mutliclass_outcome_reward
+</td>
+<td class="tg-vb5t">
+0.78989983
+</td>
+<td class="tg-vb5t">
+0.91387313
+</td>
+<td class="tg-vb5t">
+0.84172369
+</td>
+<td class="tg-vb5t">
+0.86790302
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-number-of-types-of-anomalies" class="slide level2 center">
+<h2>Analysis on Number of Types of Anomalies</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-wmr7{border-color:#ffffff;font-size:30px;text-align:left;vertical-align:bottom}
+.tg .tg-ti9p{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:30px;text-align:center;vertical-align:middle}
+.tg .tg-q1kg{border-color:#ffffff;font-size:30px;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-ana2{border-color:#ffffff;font-size:30px;font-weight:bold;text-align:center;vertical-align:middle}
+.tg .tg-h4f7{border-color:#ffffff;font-size:30px;text-align:left;vertical-align:top}
+.tg .tg-ng5i{border-color:#ffffff;font-size:30px;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-dszj{border-color:#ffffff;font-size:30px;text-align:center;vertical-align:bottom}
+.tg .tg-l8bv{border-color:#ffffff;font-size:30px;text-align:center;vertical-align:top}
+.tg .tg-t79x{border-color:#ffffff;font-size:30px;text-align:center;vertical-align:middle}
+.tg .tg-r3fx{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:30px;text-align:center;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-h4f7">
+</th>
+<th class="tg-ng5i" colspan="4">
+no anomaly
+</th>
+<th class="tg-q1kg" colspan="4">
+single
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-wmr7">
+</td>
+<td class="tg-dszj">
+class_acc
+</td>
+<td class="tg-dszj">
+affi_prec
+</td>
+<td class="tg-dszj">
+affi_recall
+</td>
+<td class="tg-dszj">
+affi_f1
+</td>
+<td class="tg-l8bv">
+class_acc
+</td>
+<td class="tg-l8bv">
+affi_prec
+</td>
+<td class="tg-l8bv">
+affi_recall
+</td>
+<td class="tg-l8bv">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-wmr7">
+base
+</td>
+<td class="tg-ana2">
+0.8799049
+</td>
+<td class="tg-ana2">
+0.8799049
+</td>
+<td class="tg-ana2">
+0.8799049
+</td>
+<td class="tg-ana2">
+0.8799049
+</td>
+<td class="tg-dszj">
+0.13978907
+</td>
+<td class="tg-dszj">
+0.33634029
+</td>
+<td class="tg-dszj">
+0.28213659
+</td>
+<td class="tg-dszj">
+0.29783494
+</td>
+</tr>
+<tr>
+<td class="tg-wmr7">
+outcome_reward
+</td>
+<td class="tg-t79x">
+0.63611221
+</td>
+<td class="tg-t79x">
+0.63611221
+</td>
+<td class="tg-t79x">
+0.63611221
+</td>
+<td class="tg-t79x">
+0.63611221
+</td>
+<td class="tg-dszj">
+0.6798839
+</td>
+<td class="tg-dszj">
+0.70769185
+</td>
+<td class="tg-dszj">
+0.72150965
+</td>
+<td class="tg-dszj">
+0.7081522
+</td>
+</tr>
+<tr>
+<td class="tg-wmr7">
+process_reward
+</td>
+<td class="tg-t79x">
+0.63141279
+</td>
+<td class="tg-t79x">
+0.63141279
+</td>
+<td class="tg-t79x">
+0.63141279
+</td>
+<td class="tg-t79x">
+0.63141279
+</td>
+<td class="tg-q1kg">
+0.7976915
+</td>
+<td class="tg-q1kg">
+0.8445544
+</td>
+<td class="tg-q1kg">
+0.8595269
+</td>
+<td class="tg-q1kg">
+0.8435712
+</td>
+</tr>
+<tr>
+<td class="tg-wmr7">
+mutliclass_outcome_reward
+</td>
+<td class="tg-ti9p">
+0.9609375
+</td>
+<td class="tg-ti9p">
+0.9609375
+</td>
+<td class="tg-ti9p">
+0.9609375
+</td>
+<td class="tg-ti9p">
+0.9609375
+</td>
+<td class="tg-r3fx">
+0.89370012
+</td>
+<td class="tg-r3fx">
+0.91456975
+</td>
+<td class="tg-r3fx">
+0.93545033
+</td>
+<td class="tg-r3fx">
+0.91885502
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7" colspan="9">
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+</td>
+<td class="tg-ng5i" colspan="4">
+double
+</td>
+<td class="tg-q1kg" colspan="4">
+triple
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+</td>
+<td class="tg-l8bv">
+class_acc
+</td>
+<td class="tg-l8bv">
+affi_prec
+</td>
+<td class="tg-l8bv">
+affi_recall
+</td>
+<td class="tg-l8bv">
+affi_f1
+</td>
+<td class="tg-l8bv">
+class_acc
+</td>
+<td class="tg-l8bv">
+affi_prec
+</td>
+<td class="tg-l8bv">
+affi_recall
+</td>
+<td class="tg-l8bv">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+base
+</td>
+<td class="tg-dszj">
+0.09536151
+</td>
+<td class="tg-dszj">
+0.42039654
+</td>
+<td class="tg-dszj">
+0.23908425
+</td>
+<td class="tg-dszj">
+0.29160892
+</td>
+<td class="tg-dszj">
+0.10968438
+</td>
+<td class="tg-dszj">
+0.53396651
+</td>
+<td class="tg-dszj">
+0.19754696
+</td>
+<td class="tg-dszj">
+0.2774276
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+outcome_reward
+</td>
+<td class="tg-dszj">
+0.35262472
+</td>
+<td class="tg-dszj">
+0.7184274
+</td>
+<td class="tg-dszj">
+0.5266675
+</td>
+<td class="tg-dszj">
+0.59161479
+</td>
+<td class="tg-dszj">
+0.23276485
+</td>
+<td class="tg-q1kg">
+0.6646748
+</td>
+<td class="tg-dszj">
+0.35377235
+</td>
+<td class="tg-dszj">
+0.44964107
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+process_reward
+</td>
+<td class="tg-q1kg">
+0.3975393
+</td>
+<td class="tg-q1kg">
+0.7305085
+</td>
+<td class="tg-q1kg">
+0.5826319
+</td>
+<td class="tg-q1kg">
+0.6321418
+</td>
+<td class="tg-q1kg">
+0.2446475
+</td>
+<td class="tg-dszj">
+0.64661129
+</td>
+<td class="tg-q1kg">
+0.3750176
+</td>
+<td class="tg-q1kg">
+0.4577084
+</td>
+</tr>
+<tr>
+<td class="tg-h4f7">
+mutliclass_outcome_reward
+</td>
+<td class="tg-r3fx">
+0.86189234
+</td>
+<td class="tg-r3fx">
+0.93144028
+</td>
+<td class="tg-r3fx">
+0.90109951
+</td>
+<td class="tg-r3fx">
+0.91024242
+</td>
+<td class="tg-r3fx">
+0.70324317
+</td>
+<td class="tg-r3fx">
+0.89823595
+</td>
+<td class="tg-r3fx">
+0.76882101
+</td>
+<td class="tg-r3fx">
+0.82072479
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-each-type-of-anomaly" class="slide level2 center">
+<h2>Analysis on Each Type of Anomaly</h2>
+<h3 id="for-single-anomaly">For single anomaly</h3>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-udbf{background-color:#FFC7CE;color:#9C0006;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-wpp2{background-color:#C6EFCE;color:#006100;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-3knx{font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-6qxa{color:#F00;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-3h0i{font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-yxuc{font-size:xx-large;text-align:center;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-3h0i">
+</th>
+<th class="tg-yxuc">
+class_acc
+</th>
+<th class="tg-yxuc">
+affi_prec
+</th>
+<th class="tg-yxuc">
+affi_recall
+</th>
+<th class="tg-yxuc">
+affi_f1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-3h0i">
+seasonal
+</td>
+<td class="tg-yxuc">
+0.893215
+</td>
+<td class="tg-3knx">
+0.91856
+</td>
+<td class="tg-yxuc">
+0.93923
+</td>
+<td class="tg-yxuc">
+0.928207
+</td>
+</tr>
+<tr>
+<td class="tg-3h0i">
+trend
+</td>
+<td class="tg-udbf">
+0.85466
+</td>
+<td class="tg-udbf">
+0.85484
+</td>
+<td class="tg-6qxa">
+0.895359
+</td>
+<td class="tg-udbf">
+0.865473
+</td>
+</tr>
+<tr>
+<td class="tg-3h0i">
+shapelet
+</td>
+<td class="tg-wpp2">
+0.93784
+</td>
+<td class="tg-wpp2">
+0.976445
+</td>
+<td class="tg-wpp2">
+0.985496
+</td>
+<td class="tg-wpp2">
+0.979781
+</td>
+</tr>
+<tr>
+<td class="tg-3h0i">
+global
+</td>
+<td class="tg-3knx">
+0.89812
+</td>
+<td class="tg-yxuc">
+0.908477
+</td>
+<td class="tg-3knx">
+0.96642
+</td>
+<td class="tg-3knx">
+0.92898
+</td>
+</tr>
+<tr>
+<td class="tg-3h0i">
+contextual
+</td>
+<td class="tg-6qxa">
+0.878254
+</td>
+<td class="tg-6qxa">
+0.908063
+</td>
+<td class="tg-udbf">
+0.883902
+</td>
+<td class="tg-6qxa">
+0.885246
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><p>LLMs are good at detecting shaeplet and global anomalies.</p></li>
+<li><p>LLMs are not goot at detecting trend and contextual anomalies.</p></li>
+</ul>
+</section>
+<section id="analysis-on-each-type-of-anomaly-1" class="slide level2 center">
+<h2>Analysis on Each Type of Anomaly</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-5cot{border-color:#ffffff;color:#F00;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-xfr4{background-color:#FFC7CE;border-color:#ffffff;color:#9C0006;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-lgs5{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-3dyv{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:top}
+.tg .tg-7pq3{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:top}
+.tg .tg-1pbj{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-89pd{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-fmsy{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-7pq3">
+</th>
+<th class="tg-3dyv" colspan="4">
+double anomalies
+</th>
+<th class="tg-3dyv" colspan="4">
+triple anomalies
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-1pbj">
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+<td class="tg-89pd">
+class_acc
+</td>
+<td class="tg-89pd">
+affi_prec
+</td>
+<td class="tg-89pd">
+affi_recall
+</td>
+<td class="tg-89pd">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_contained
+</td>
+<td class="tg-lgs5">
+0.877631
+</td>
+<td class="tg-fmsy">
+0.93439
+</td>
+<td class="tg-lgs5">
+0.913463
+</td>
+<td class="tg-lgs5">
+0.918296
+</td>
+<td class="tg-lgs5">
+0.733518
+</td>
+<td class="tg-5cot">
+0.893675
+</td>
+<td class="tg-lgs5">
+0.796038
+</td>
+<td class="tg-fmsy">
+0.83522
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_contained
+</td>
+<td class="tg-xfr4">
+0.746717
+</td>
+<td class="tg-xfr4">
+0.895155
+</td>
+<td class="tg-xfr4">
+0.809342
+</td>
+<td class="tg-xfr4">
+0.838939
+</td>
+<td class="tg-xfr4">
+0.664177
+</td>
+<td class="tg-xfr4">
+0.877987
+</td>
+<td class="tg-xfr4">
+0.737089
+</td>
+<td class="tg-xfr4">
+0.792569
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+shapelet_contained
+</td>
+<td class="tg-fmsy">
+0.85504
+</td>
+<td class="tg-lgs5">
+0.94023
+</td>
+<td class="tg-fmsy">
+0.90118
+</td>
+<td class="tg-fmsy">
+0.91584
+</td>
+<td class="tg-fmsy">
+0.72897
+</td>
+<td class="tg-lgs5">
+0.903229
+</td>
+<td class="tg-fmsy">
+0.79199
+</td>
+<td class="tg-lgs5">
+0.837845
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+global_contained
+</td>
+<td class="tg-89pd">
+0.78567
+</td>
+<td class="tg-5cot">
+0.919494
+</td>
+<td class="tg-89pd">
+0.831072
+</td>
+<td class="tg-89pd">
+0.863258
+</td>
+<td class="tg-89pd">
+0.689337
+</td>
+<td class="tg-89pd">
+0.895391
+</td>
+<td class="tg-5cot">
+0.746046
+</td>
+<td class="tg-5cot">
+0.805428
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+contextual_contained
+</td>
+<td class="tg-5cot">
+0.765528
+</td>
+<td class="tg-89pd">
+0.924652
+</td>
+<td class="tg-5cot">
+0.816537
+</td>
+<td class="tg-5cot">
+0.857294
+</td>
+<td class="tg-5cot">
+0.681727
+</td>
+<td class="tg-fmsy">
+0.8972
+</td>
+<td class="tg-89pd">
+0.752732
+</td>
+<td class="tg-89pd">
+0.810951
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li><p>Different from the previous results, LLMs are not good at detecting anomalies when</p>
+<p>the data contains global anomaly and the other type of anomalies.</p>
+<ul>
+<li><p>The reason may be when global anomaly combined with other anomalies, the LLMs</p>
+<p>concentrate on detecting global ones, and disregard contextual ones.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="analysis-on-each-type-of-anomaly-2" class="slide level2 center">
+<h2>Analysis on Each Type of Anomaly</h2>
+<h3 id="double-anomalies">Double Anomalies</h3>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-5cot{border-color:#ffffff;color:#F00;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-pzn3{border-color:#ffffff;color:#F00;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-xfr4{background-color:#FFC7CE;border-color:#ffffff;color:#9C0006;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-lgs5{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-1pbj{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-89pd{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-fmsy{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-6y80{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:left;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-1pbj">
+</th>
+<th class="tg-89pd">
+class_acc
+</th>
+<th class="tg-89pd">
+affi_prec
+</th>
+<th class="tg-89pd">
+affi_recall
+</th>
+<th class="tg-89pd">
+affi_f1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-1pbj">
+seasonal_trend
+</td>
+<td class="tg-89pd">
+0.842984
+</td>
+<td class="tg-89pd">
+0.894164
+</td>
+<td class="tg-89pd">
+0.897062
+</td>
+<td class="tg-89pd">
+0.888484
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_shaplet
+</td>
+<td class="tg-lgs5">
+0.931227
+</td>
+<td class="tg-lgs5">
+0.965168
+</td>
+<td class="tg-lgs5">
+0.964355
+</td>
+<td class="tg-lgs5">
+0.963332
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_global
+</td>
+<td class="tg-fmsy">
+0.89705
+</td>
+<td class="tg-89pd">
+0.930316
+</td>
+<td class="tg-fmsy">
+0.93358
+</td>
+<td class="tg-89pd">
+0.930434
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_contextual
+</td>
+<td class="tg-89pd">
+0.839266
+</td>
+<td class="tg-89pd">
+0.947918
+</td>
+<td class="tg-89pd">
+0.858852
+</td>
+<td class="tg-89pd">
+0.890934
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_shapelet
+</td>
+<td class="tg-89pd">
+0.792316
+</td>
+<td class="tg-89pd">
+0.912551
+</td>
+<td class="tg-89pd">
+0.844719
+</td>
+<td class="tg-89pd">
+0.871055
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_global
+</td>
+<td class="tg-xfr4">
+0.656574
+</td>
+<td class="tg-5cot">
+0.892055
+</td>
+<td class="tg-xfr4">
+0.705598
+</td>
+<td class="tg-xfr4">
+0.773574
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_contextual
+</td>
+<td class="tg-5cot">
+0.694992
+</td>
+<td class="tg-xfr4">
+0.881852
+</td>
+<td class="tg-89pd">
+0.789988
+</td>
+<td class="tg-89pd">
+0.822645
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+shapelet_global
+</td>
+<td class="tg-1pbj">
+0.87891
+</td>
+<td class="tg-1pbj">
+0.934984
+</td>
+<td class="tg-1pbj">
+0.931727
+</td>
+<td class="tg-6y80">
+0.9312
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+shapelet_contextual
+</td>
+<td class="tg-1pbj">
+0.817707
+</td>
+<td class="tg-6y80">
+0.94822
+</td>
+<td class="tg-1pbj">
+0.863926
+</td>
+<td class="tg-1pbj">
+0.897777
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+global_contextual
+</td>
+<td class="tg-1pbj">
+0.710148
+</td>
+<td class="tg-1pbj">
+0.920621
+</td>
+<td class="tg-pzn3">
+0.753383
+</td>
+<td class="tg-pzn3">
+0.81782
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-each-type-of-anomaly-3" class="slide level2 center">
+<h2>Analysis on Each Type of Anomaly</h2>
+<h3 id="triple-anomalies">Triple Anomalies</h3>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-5cot{border-color:#ffffff;color:#F00;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-xfr4{background-color:#FFC7CE;border-color:#ffffff;color:#9C0006;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-lgs5{background-color:#C6EFCE;border-color:#ffffff;color:#006100;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-1pbj{border-color:#ffffff;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-89pd{border-color:#ffffff;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-fmsy{border-color:#ffffff;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-1pbj">
+</th>
+<th class="tg-89pd">
+class_acc
+</th>
+<th class="tg-89pd">
+affi_prec
+</th>
+<th class="tg-89pd">
+affi_recall
+</th>
+<th class="tg-89pd">
+affi_f1
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-1pbj">
+seasonal_trend_shapelet
+</td>
+<td class="tg-fmsy">
+0.76289
+</td>
+<td class="tg-89pd">
+0.887395
+</td>
+<td class="tg-fmsy">
+0.82719
+</td>
+<td class="tg-89pd">
+0.850844
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_trend_global
+</td>
+<td class="tg-5cot">
+0.642578
+</td>
+<td class="tg-xfr4">
+0.862484
+</td>
+<td class="tg-5cot">
+0.699313
+</td>
+<td class="tg-5cot">
+0.762664
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_trend_contextual
+</td>
+<td class="tg-89pd">
+0.690887
+</td>
+<td class="tg-89pd">
+0.87073
+</td>
+<td class="tg-89pd">
+0.778551
+</td>
+<td class="tg-89pd">
+0.815152
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_shapelet_global
+</td>
+<td class="tg-lgs5">
+0.829363
+</td>
+<td class="tg-89pd">
+0.906871
+</td>
+<td class="tg-lgs5">
+0.890117
+</td>
+<td class="tg-lgs5">
+0.895938
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_shapelet_contextual
+</td>
+<td class="tg-89pd">
+0.75625
+</td>
+<td class="tg-89pd">
+0.92268
+</td>
+<td class="tg-89pd">
+0.810969
+</td>
+<td class="tg-fmsy">
+0.85857
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+seasonal_global_contextual
+</td>
+<td class="tg-89pd">
+0.719137
+</td>
+<td class="tg-fmsy">
+0.91189
+</td>
+<td class="tg-89pd">
+0.770086
+</td>
+<td class="tg-89pd">
+0.828152
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_shapelet_global
+</td>
+<td class="tg-89pd">
+0.670262
+</td>
+<td class="tg-89pd">
+0.895031
+</td>
+<td class="tg-89pd">
+0.714781
+</td>
+<td class="tg-89pd">
+0.788875
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_shapelet_contextual
+</td>
+<td class="tg-89pd">
+0.649406
+</td>
+<td class="tg-89pd">
+0.881805
+</td>
+<td class="tg-89pd">
+0.754809
+</td>
+<td class="tg-89pd">
+0.806891
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+trend_global_contextual
+</td>
+<td class="tg-xfr4">
+0.569039
+</td>
+<td class="tg-5cot">
+0.870477
+</td>
+<td class="tg-xfr4">
+0.647887
+</td>
+<td class="tg-xfr4">
+0.730988
+</td>
+</tr>
+<tr>
+<td class="tg-1pbj">
+shapelet_global_contextual
+</td>
+<td class="tg-89pd">
+0.705645
+</td>
+<td class="tg-lgs5">
+0.92559
+</td>
+<td class="tg-89pd">
+0.75409
+</td>
+<td class="tg-89pd">
+0.825949
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-on-patten-and-point-anomalies" class="slide level2 center">
+<h2>Analysis on Patten and Point Anomalies</h2>
+<p><br></p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-wnnb{border-color:inherit;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-apga{border-color:inherit;font-size:xx-large;font-weight:bold;text-align:center;vertical-align:bottom}
+.tg .tg-fi53{border-color:inherit;font-size:xx-large;text-align:left;vertical-align:bottom}
+.tg .tg-dnub{background-color:#C6EFCE;border-color:inherit;color:#006100;font-size:xx-large;text-align:center;vertical-align:bottom}
+.tg .tg-1ovc{background-color:#FFC7CE;border-color:inherit;color:#9C0006;font-size:xx-large;text-align:center;vertical-align:bottom}
+</style>
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-apga" colspan="5">
+single anomaly
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-fi53">
+</td>
+<td class="tg-wnnb">
+class_acc
+</td>
+<td class="tg-wnnb">
+affi_prec
+</td>
+<td class="tg-wnnb">
+affi_recall
+</td>
+<td class="tg-wnnb">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+pattern
+</td>
+<td class="tg-dnub">
+0.895238
+</td>
+<td class="tg-dnub">
+0.916615
+</td>
+<td class="tg-dnub">
+0.940029
+</td>
+<td class="tg-dnub">
+0.924487
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+point
+</td>
+<td class="tg-1ovc">
+0.888186
+</td>
+<td class="tg-1ovc">
+0.90827
+</td>
+<td class="tg-1ovc">
+0.92516
+</td>
+<td class="tg-1ovc">
+0.907111
+</td>
+</tr>
+<tr>
+<td class="tg-apga" colspan="5">
+double anomalies
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+double anomaly
+</td>
+<td class="tg-wnnb">
+class_acc
+</td>
+<td class="tg-wnnb">
+affi_prec
+</td>
+<td class="tg-wnnb">
+affi_recall
+</td>
+<td class="tg-wnnb">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+pattern_only
+</td>
+<td class="tg-dnub">
+0.855509
+</td>
+<td class="tg-dnub">
+0.923961
+</td>
+<td class="tg-dnub">
+0.902046
+</td>
+<td class="tg-dnub">
+0.907624
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+point_only
+</td>
+<td class="tg-1ovc">
+0.710148
+</td>
+<td class="tg-1ovc">
+0.920621
+</td>
+<td class="tg-1ovc">
+0.753383
+</td>
+<td class="tg-1ovc">
+0.81782
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+pattern_point_combined
+</td>
+<td class="tg-wnnb">
+0.797416
+</td>
+<td class="tg-wnnb">
+0.922557
+</td>
+<td class="tg-wnnb">
+0.847279
+</td>
+<td class="tg-wnnb">
+0.874428
+</td>
+</tr>
+<tr>
+<td class="tg-wnnb" colspan="5">
+<span style="font-weight:bold">triple anomalies</span>
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+triple anomaly
+</td>
+<td class="tg-wnnb">
+class_acc
+</td>
+<td class="tg-wnnb">
+affi_prec
+</td>
+<td class="tg-wnnb">
+affi_recall
+</td>
+<td class="tg-wnnb">
+affi_f1
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+pattern_only
+</td>
+<td class="tg-dnub">
+0.762891
+</td>
+<td class="tg-1ovc">
+0.887395
+</td>
+<td class="tg-dnub">
+0.827191
+</td>
+<td class="tg-dnub">
+0.850844
+</td>
+</tr>
+<tr>
+<td class="tg-fi53">
+pattern_point_combined
+</td>
+<td class="tg-1ovc">
+0.692507
+</td>
+<td class="tg-dnub">
+0.894173
+</td>
+<td class="tg-1ovc">
+0.757845
+</td>
+<td class="tg-1ovc">
+0.812576
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<ul>
+<li>Pattern anomalies are easier to detect than point anomalies for LLMs.</li>
+</ul>
+</section>
+<section id="output-example-1" class="slide level2 center">
+<h2>Output Example</h2>
+
+<img data-src="images/2025-11-09-18-38-42.png" class="r-stretch"><div class="code-3xl">
+<div class="code-h-70">
+<pre class="heigth"><code>&lt;think&gt;
+The provided time series shows a series of oscillations with a periodic pattern. There are a few points where the pattern deviates from the norm:
+
+1. At around 97, there is a sharp spike that deviates significantly from the rest of the series, indicating a Global Anomaly.
+2. Between 420 and 500, there is a noticeable change in the frequency of the oscillations, suggesting a Seasonal Anomaly.
+3. Between 1060 and 1076, there is a short, sharp, and irregular segment, indicating a Shapelet Anomaly.
+4. Between 1820 and 1830, there is another short, sharp, and irregular segment, indicating a Shapelet Anomaly.
+5. At around 1940, there is a sharp spike that deviates significantly from the rest of the series, indicating a Global Anomaly.
+
+&lt;/think&gt;
+&lt;anomaly&gt;
+[
+  {"type": "Global", "locations": [{"start": 97, "end": 97}, {"start": 1940, "end": 1940}]},
+  {"type": "Seasonal", "locations": [{"start": 420, "end": 500}]},
+  {"type": "Shapelet", "locations": [{"start": 1060, "end": 1076}, {"start": 1820, "end": 1830}]}
+]
+&lt;/anomaly&gt;</code></pre>
+</div>
+</div>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="25_11_12_meeting_notes_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1920,
+
+        height: 1080,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
